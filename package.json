@@ -1,0 +1,24 @@
+{
+  "name": "my-coin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/elliptic": "^6.4.12",
+    "crypto-js": "^4.0.0",
+    "elliptic": "^6.5.4",
+    "secp256k1": "^4.0.2",
+    "ts-node": "^9.1.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.0"
+  }
+}
