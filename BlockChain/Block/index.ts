@@ -26,7 +26,6 @@ class Block {
     this.difficultly = difficultly;
     this.nonce = nonce;
   }
-
 }
 
 export default Block;

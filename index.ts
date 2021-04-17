@@ -1,4 +1,7 @@
+import BlockChain from './BlockChain';
 import { generateKeyPair, hash } from './utils/commonUtils';
 
 
-console.log(hash(123));
+const chain = new BlockChain();
+
+chain.addBlock([]);
