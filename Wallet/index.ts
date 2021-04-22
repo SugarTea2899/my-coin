@@ -15,7 +15,7 @@ class Wallet {
     this.address = this.keyPair.getPublic().encode("hex", false);
   }
 
-  getBalance (unspentTxOuts: UnspentTxOut[]): number {
+  getBalance (unspentTxOuts: Map<string, UnspentTxOut>): number {
     let balance = 0;
 
     unspentTxOuts.forEach(item => balance += item.amount);
@@ -23,13 +23,13 @@ class Wallet {
     return balance;
   }
 
-  createTransaction (receiptAddress: string, amount: number, unspentTxOuts: UnspentTxOut[]) {
+  createTransaction (receiptAddress: string, amount: number, unspentTxOuts: Map<string, UnspentTxOut>) {
     const {includedTxOuts, remainAmount} = this.findTxOutsForAmount(amount, unspentTxOuts);
 
     if (!includedTxOuts && !remainAmount) {
       const txOut = new TxOut(receiptAddress, amount);
       const txIns = includedTxOuts.map((unspentTxOut: UnspentTxOut) => {
-        const txIn: TxIn = new TxIn(unspentTxOut.txOutId, unspentTxOut.txOutIndex, null);
+        const txIn: TxIn = new TxIn(unspentTxOut.txOutId, null);
         return txIn;
       })
 
@@ -37,22 +37,36 @@ class Wallet {
 
       return transaction;
     } else {
-      throw new Error('You are not enough coin to send.');
+      throw new Error('You are not enough coins to send.');
     }
   }
 
-  findTxOutsForAmount (amount: number, unspentTxOuts: UnspentTxOut[]): any {
-      
+  private findTxOutsForAmount (amount: number, unspentTxOuts: Map<string, UnspentTxOut>): any {
+      let includedTxOuts = [];
+      let remainAmount = 0;
+      let curAmount = 0;
+
+      unspentTxOuts.forEach((unspentTxOut: UnspentTxOut) => {
+        if (this.address === unspentTxOut.address) {
+          curAmount += unspentTxOut.amount;
+          includedTxOuts.push(unspentTxOut);
+
+          if (curAmount >= amount) {
+            remainAmount = amount - curAmount;
+            return {includedTxOuts, remainAmount}
+          }
+        }
+      });
   }
 
-  signTransaction (transaction: Transaction, unspentTxOuts: UnspentTxOut[]) {
+  signTransaction (transaction: Transaction, unspentTxOuts: Map<string, UnspentTxOut>) {
 
     if (transaction.senderAddress !== this.address) {
       throw new Error('Transaction address is not match');
     }
 
     transaction.txIns?.forEach((txIn: TxIn) => {
-      if (!verifyUnspentTxOut(txIn.txOutId, txIn.txOutIndex, this.address, unspentTxOuts)) {
+      if (!verifyUnspentTxOut(txIn.txOutId, this.address, unspentTxOuts)) {
         throw new Error('Cannot find unspentTxOut by txIn');
       }
 

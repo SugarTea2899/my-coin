@@ -16,7 +16,7 @@ class Transaction {
 
   hashData(): string {
     const txInContent: string = this.txIns
-      .map((txIn: TxIn) => txIn.txOutId + txIn.txOutIndex)
+      .map((txIn: TxIn) => txIn.txOutId)
       .reduce((a, b) => a + b, "");
 
     const txOutContent: string = this.txOuts
