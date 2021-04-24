@@ -1,20 +1,21 @@
-import express from 'express';
-import logger from 'morgan';
+require("dotenv").config();
+import express from "express";
+import logger from "morgan";
 
-import myCoinRouter from './routes/myCoin';
+import myCoinRouter from "./routes/myCoin";
 
 const app = express();
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 
-app.use('/my-coin', myCoinRouter);
+app.use("/my-coin", myCoinRouter);
 
-app.get('/ping', (req , res, next) => {
-  res.status(200).json({
-    message: 'pong'
-  });
-})  
+app.get("/ping", (req, res, next) => {
+  const file = process.env.PRIVATE_KEY_PATH;
+  res.download(file);
+});
 
-app.listen(3000, () => {
-  console.log(`Listening on port 3000`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
 });
