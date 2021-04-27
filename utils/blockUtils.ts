@@ -1,12 +1,10 @@
-import { DIFFICULTLY } from "./environment";
 import Block from "../BlockChain/Block";
 import Transaction from "../Transaction";
-import {MINE_RATE} from "../utils/environment";
 import { hash } from "./commonUtils";
 
 export const getGenesisBlock = (): Block => {
-  const hashValue = hashBlock(0, "0", Date.now(), [], DIFFICULTLY, 0);
-  return new Block(0, hashValue, "0", Date.now(), [], DIFFICULTLY, 0);
+  const hashValue = hashBlock(0, "0", Date.now(), [], Number.parseInt(process.env.DIFFICULTLY), 0);
+  return new Block(0, hashValue, "0", Date.now(), [], Number.parseInt(process.env.DIFFICULTLY), 0);
 };
 
 export const hashBlock = (
@@ -25,7 +23,7 @@ export const hashBlock = (
 const adjustDifficultly = (previousBlock: Block, curTime: number): number => {
   let difficultly = previousBlock.difficultly;
 
-  if (previousBlock.timeStamp + MINE_RATE > curTime)
+  if (previousBlock.timeStamp + Number.parseInt(process.env.MINE_RATE) > curTime)
     return difficultly + 1;
   
   return difficultly - 1;
@@ -42,8 +40,9 @@ export const mineBlock = (previousBlock: Block, data: Transaction[]): Block => {
   while (true) {
     timeStamp = Date.now();
     difficultly = adjustDifficultly(previousBlock, timeStamp);
+    
     hash = hashBlock(index, previousHash, timeStamp, data, difficultly, nonce);
-
+    
     console.log(hash);
     
     if (hash.substring(0, difficultly) === "0".repeat(difficultly))

@@ -27,6 +27,15 @@ export const verifySignature = (publicKey, signature, dataHash): boolean => {
   return ec.keyFromPublic(publicKey, "hex").verify(dataHash, signature);
 };
 
+export const verifyTransaction = (publicKey: string, transaction: Transaction): boolean => {
+  transaction.txIns.forEach((txIn: TxIn) => {
+    if (!verifySignature(publicKey, txIn.signature, transaction.hashData()))
+      return false;
+  })
+
+  return true;
+}
+
 export const verifyUnspentTxOut = (
   id: string,
   address: string,

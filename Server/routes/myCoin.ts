@@ -9,4 +9,16 @@ router.get('/blocks', myCoinController.getBlocks);
 // create-wallet
 router.post('/wallets', myCoinController.createWallet)
 
+// start mining
+router.post('/mining', myCoinAuthenticate, myCoinController.mining)
+
+// get wallet information
+router.get('/wallets', myCoinAuthenticate, myCoinController.getWalletInfo);
+
+// create transaction
+router.post('/transactions', myCoinAuthenticate, myCoinController.createTransaction);
+
+// get transactions in pool
+router.get('/transactions', myCoinController.getTransactionsInPool)
+
 export default router;

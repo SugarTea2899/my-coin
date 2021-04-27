@@ -3,8 +3,8 @@ class UnspentTxOut {
   public readonly address: string;
   public readonly amount: number;
   public inPool: boolean;
-
-  constructor (txOutId: string, txOutIndex: number, address: string, amount: number) {
+g
+  constructor (txOutId: string, address: string, amount: number) {
     this.txOutId = txOutId;
     this.address = address;
     this.amount = amount;

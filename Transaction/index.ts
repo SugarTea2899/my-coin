@@ -5,13 +5,16 @@ import TxOut from "./TxOut";
 class Transaction {
   public id: string;
   public senderAddress: string;
+  public remain: number;
+
   public txIns: TxIn[];
   public txOuts: TxOut[];
 
-  constructor(senderAddress: string, txIns: TxIn[], txOuts: TxOut[]) {
+  constructor(senderAddress: string, remain: number, txIns: TxIn[], txOuts: TxOut[]) {
     this.senderAddress = senderAddress;
     this.txIns = txIns;
     this.txOuts = txOuts;
+    this.remain = remain;
   }
 
   hashData(): string {

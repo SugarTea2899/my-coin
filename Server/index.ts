@@ -7,6 +7,7 @@ import myCoinRouter from "./routes/myCoin";
 const app = express();
 
 app.use(logger("dev"));
+app.use(express.json())
 
 app.use("/my-coin", myCoinRouter);
 
@@ -16,6 +17,7 @@ app.get("/ping", (req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });

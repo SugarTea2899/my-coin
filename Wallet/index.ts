@@ -1,3 +1,4 @@
+import { unSpentTxOuts } from './../Server/data/index';
 import { verifyUnspentTxOut } from './../utils/commonUtils';
 import { ec as EC } from "elliptic";
 import Transaction from "../Transaction";
@@ -18,7 +19,10 @@ class Wallet {
   getBalance (unspentTxOuts: Map<string, UnspentTxOut>): number {
     let balance = 0;
 
-    unspentTxOuts.forEach(item => balance += item.amount);
+    unspentTxOuts.forEach((unSpentTxOut: UnspentTxOut) => {
+      if (unSpentTxOut.address === this.address && !unSpentTxOut.inPool)
+        balance += unSpentTxOut.amount
+    })
 
     return balance;
   }
@@ -26,14 +30,14 @@ class Wallet {
   createTransaction (receiptAddress: string, amount: number, unspentTxOuts: Map<string, UnspentTxOut>) {
     const {includedTxOuts, remainAmount} = this.findTxOutsForAmount(amount, unspentTxOuts);
 
-    if (!includedTxOuts && !remainAmount) {
+    if (includedTxOuts !== null && remainAmount !== null) {
       const txOut = new TxOut(receiptAddress, amount);
       const txIns = includedTxOuts.map((unspentTxOut: UnspentTxOut) => {
         const txIn: TxIn = new TxIn(unspentTxOut.txOutId, null);
         return txIn;
       })
 
-      const transaction = new Transaction(this.address, txIns, [txOut]);
+      const transaction = new Transaction(this.address, remainAmount,txIns, [txOut]);
 
       return transaction;
     } else {
@@ -46,17 +50,18 @@ class Wallet {
       let remainAmount = 0;
       let curAmount = 0;
 
-      unspentTxOuts.forEach((unspentTxOut: UnspentTxOut) => {
-        if (this.address === unspentTxOut.address) {
+      for (const [key, unspentTxOut] of unSpentTxOuts) {
+        if (this.address === unspentTxOut.address && !unspentTxOut.inPool) {
           curAmount += unspentTxOut.amount;
           includedTxOuts.push(unspentTxOut);
 
           if (curAmount >= amount) {
-            remainAmount = amount - curAmount;
+            remainAmount = curAmount - amount;
             return {includedTxOuts, remainAmount}
           }
         }
-      });
+      }
+      return {includedTxOuts: null, remainAmount: null};
   }
 
   signTransaction (transaction: Transaction, unspentTxOuts: Map<string, UnspentTxOut>) {

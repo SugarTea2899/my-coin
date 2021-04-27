@@ -9,6 +9,8 @@ class Block {
   public difficultly: number;
   public nonce: number;
 
+  public miner: string;
+  
   constructor(
     index: number,
     hash: string,

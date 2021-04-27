@@ -10,8 +10,13 @@ class BlockChain {
     this.chain = [blockUtil.getGenesisBlock()];
   }
 
-  addBlock(data: Transaction[]): Block {
+  addBlock(data: Transaction[], miner: string): Block {
     const block = blockUtil.mineBlock(this.chain[this.chain.length - 1], data);
+
+    if (!this.verifyNewBlock(block))
+      throw Error('New block is invalid');
+    
+    block.miner = miner;
     this.chain.push(block);
 
     console.log(block);
@@ -27,6 +32,9 @@ class BlockChain {
     return false;
   }
 
+  verifyNewBlock (newBlock: Block): boolean {
+    return this.chain[this.chain.length - 1].hash === newBlock.previousHash;
+  }
 }
 
 export default BlockChain;
