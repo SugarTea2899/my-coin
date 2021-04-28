@@ -1,3 +1,4 @@
+import BlockChain from "../BlockChain";
 import Block from "../BlockChain/Block";
 import Transaction from "../Transaction";
 import { hash } from "./commonUtils";
@@ -29,16 +30,17 @@ const adjustDifficultly = (previousBlock: Block, curTime: number): number => {
   return difficultly - 1;
 };
 
-export const mineBlock = (previousBlock: Block, data: Transaction[]): Block => {
+export const mineBlock = (blockchain: BlockChain, data: Transaction[]): Block => {
   let hash: string;
-  let index: number = previousBlock.index + 1;
-  let difficultly = previousBlock.difficultly;
   let nonce = 0;
-  let timeStamp = Date.now();
-  const previousHash = previousBlock.hash;
 
   while (true) {
-    timeStamp = Date.now();
+    const previousBlock = blockchain.chain[blockchain.chain.length - 1];
+    const previousHash = previousBlock.hash;
+    const index: number = previousBlock.index + 1;
+    const timeStamp = Date.now();
+    let difficultly = previousBlock.difficultly;
+
     difficultly = adjustDifficultly(previousBlock, timeStamp);
     
     hash = hashBlock(index, previousHash, timeStamp, data, difficultly, nonce);

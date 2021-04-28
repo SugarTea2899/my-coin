@@ -11,7 +11,7 @@ class BlockChain {
   }
 
   addBlock(data: Transaction[], miner: string): Block {
-    const block = blockUtil.mineBlock(this.chain[this.chain.length - 1], data);
+    const block = blockUtil.mineBlock(this, data);
 
     if (!this.verifyNewBlock(block))
       throw Error('New block is invalid');
