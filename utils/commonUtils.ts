@@ -1,9 +1,11 @@
+import { SUCCESS_TRANSACTION, WAITING_CONFIRM } from './constants';
 import { v1 as uuidv1 } from "uuid";
 import { ec as EC } from "elliptic";
 import SHA256 from "crypto-js/sha256";
 import UnspentTxOut from "../Transaction/UnspentTxOut";
 import Transaction from "../Transaction";
 import TxIn from "../Transaction/TxIn";
+import Block from "../BlockChain/Block";
 
 const ec = new EC("secp256k1");
 
@@ -55,3 +57,33 @@ export const updateInPoolValueTransaction = (
       unSpentTxOuts.get(txIn.txOutId).inPool = true;
   })
 };
+
+export const convertTransactionFromChain = (chain: Block[]): any => {
+  let results = [];
+
+  chain.forEach((block: Block) => {
+    const transactions = block.data.map((tx: Transaction) => ({
+      senderAddress: tx.senderAddress,
+      receiverAddress: tx.txOuts[0].address,
+      amount: tx.txOuts[0].amount,
+      timeStamp: tx.timeStamp,
+      id: tx.hashData(),
+      status: SUCCESS_TRANSACTION
+    }));
+
+    results = [...results, ... transactions];
+  })
+
+  return results.reverse();
+}
+
+export const convertTransactionInPool = (txsInPool: Transaction[]): any => {
+  return txsInPool.map((tx: Transaction) => ({
+    senderAddress: tx.senderAddress,
+    receiverAddress: tx.txOuts[0].address,
+    amount: tx.txOuts[0].amount,
+    timeStamp: tx.timeStamp,
+    id: tx.hashData(),
+    status: WAITING_CONFIRM
+  })).reverse();
+}

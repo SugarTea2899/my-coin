@@ -1,4 +1,4 @@
-import { generateKeyPair, generateId } from "./../../utils/commonUtils";
+import { generateKeyPair, generateId, convertTransactionFromChain, convertTransactionInPool } from "./../../utils/commonUtils";
 import { blockchain, pool, unSpentTxOuts } from "./../data/index";
 import { ec as EC } from "elliptic";
 import { NextFunction, Request, Response } from "express";
@@ -6,6 +6,7 @@ import fs from "fs";
 import UnspentTxOut from "../../Transaction/UnspentTxOut";
 import Wallet from "../../Wallet";
 import Transaction from "../../Transaction";
+import Block from "../../BlockChain/Block";
 
 const ec = new EC("secp256k1");
 
@@ -123,4 +124,26 @@ export const getTransactionsInPool = (req: Request, res: Response, next: NextFun
     })
   }
 
+}
+
+export const getHistory = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const blocks: Block[] = blockchain.chain;
+    
+    const transactions = [...convertTransactionFromChain(blocks), ...convertTransactionInPool(pool.transactions)];
+
+    return res.status(200).json({
+      message: 'OK',
+      payload: {
+        blocks,
+        transactions
+      }
+    })
+  } catch (error) {
+    console.log(error.message);
+    
+    res.status(500).json({
+      message: error.message
+    })
+  }
 }

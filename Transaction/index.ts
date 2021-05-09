@@ -6,7 +6,7 @@ class Transaction {
   public id: string;
   public senderAddress: string;
   public remain: number;
-
+  public timeStamp: number;
   public txIns: TxIn[];
   public txOuts: TxOut[];
 
@@ -15,6 +15,7 @@ class Transaction {
     this.txIns = txIns;
     this.txOuts = txOuts;
     this.remain = remain;
+    this.timeStamp = Date.now();
   }
 
   hashData(): string {

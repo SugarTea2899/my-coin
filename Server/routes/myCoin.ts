@@ -21,4 +21,7 @@ router.post('/transactions', myCoinAuthenticate, myCoinController.createTransact
 // get transactions in pool
 router.get('/transactions', myCoinController.getTransactionsInPool)
 
+// get history
+router.get('/history', myCoinController.getHistory);
+
 export default router;

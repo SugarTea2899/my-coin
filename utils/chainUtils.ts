@@ -1,5 +1,7 @@
+import { SUCCESS_TRANSACTION } from './constants';
 import { getGenesisBlock, hashBlock } from "./blockUtils";
 import Block from "../BlockChain/Block";
+import Transaction from "../Transaction";
 
 export const isValidChain = (chain: Block[]): boolean => {
   if (chain && JSON.stringify(chain[0]) !== JSON.stringify(getGenesisBlock()))

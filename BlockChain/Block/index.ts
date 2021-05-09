@@ -18,7 +18,8 @@ class Block {
     timeStamp: number,
     data: Transaction[],
     difficultly: number,
-    nonce: number
+    nonce: number,
+    miner?: string,
   ) {
     this.index = index;
     this.hash = hash;
@@ -27,6 +28,7 @@ class Block {
     this.data = data;
     this.difficultly = difficultly;
     this.nonce = nonce;
+    this.miner = miner || '';
   }
 }
 

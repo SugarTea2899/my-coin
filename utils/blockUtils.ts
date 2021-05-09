@@ -5,7 +5,7 @@ import { hash } from "./commonUtils";
 
 export const getGenesisBlock = (): Block => {
   const hashValue = hashBlock(0, "0", Date.now(), [], Number.parseInt(process.env.DIFFICULTLY), 0);
-  return new Block(0, hashValue, "0", Date.now(), [], Number.parseInt(process.env.DIFFICULTLY), 0);
+  return new Block(0, hashValue, "0", Date.now(), [], Number.parseInt(process.env.DIFFICULTLY), 0, 'genesis block');
 };
 
 export const hashBlock = (

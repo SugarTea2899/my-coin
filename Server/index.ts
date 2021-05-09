@@ -1,11 +1,12 @@
 require("dotenv").config();
 import express from "express";
 import logger from "morgan";
-
+import cors from "cors";
 import myCoinRouter from "./routes/myCoin";
 
 const app = express();
 
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json())
 
