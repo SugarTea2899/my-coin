@@ -173,3 +173,27 @@ export const getTransactionsByPrivateKey = (req: any, res: Response, NextFunctio
     })
   }
 }
+
+export const getBlockByIndex = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {index} = req.params;
+    const indexNumber = Number.parseInt(index);
+
+    if (indexNumber >= blockchain.chain.length) {
+      return res.status(400).json({
+        message: 'index is not valid.'
+      })
+    }
+
+    return res.status(200).json({
+      message: 'OK',
+      payload: blockchain.chain[indexNumber]
+    })
+  } catch (error) {
+    console.log(error.message);
+    
+    res.status(500).json({
+      message: error.message
+    })
+  }
+}

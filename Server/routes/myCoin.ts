@@ -27,4 +27,7 @@ router.get('/history', myCoinController.getHistory);
 // get my transactions
 router.get('/transactions/mine', myCoinAuthenticate, myCoinController.getTransactionsByPrivateKey)
 
+// get block by index
+router.get('/blocks/:index', myCoinController.getBlockByIndex)
+
 export default router;
