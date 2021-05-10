@@ -1,4 +1,4 @@
-import { generateKeyPair, generateId, convertTransactionFromChain, convertTransactionInPool } from "./../../utils/commonUtils";
+import { generateKeyPair, generateId, convertTransactionFromChain, convertTransactionInPool, getMyTransactions } from "./../../utils/commonUtils";
 import { blockchain, pool, unSpentTxOuts } from "./../data/index";
 import { ec as EC } from "elliptic";
 import { NextFunction, Request, Response } from "express";
@@ -34,7 +34,7 @@ export const mining = (req: any, res: Response, next: NextFunction) => {
   const validTransactions = pool.getValidTransactions();
   const wallet: Wallet = req.myWallet
   try {
-    blockchain.addBlock(validTransactions, wallet.address);
+    const newBlock = blockchain.addBlock(validTransactions, wallet.address);
     //reward miner
     const unSpentTxOut: UnspentTxOut = new UnspentTxOut(
       generateId(),
@@ -45,7 +45,12 @@ export const mining = (req: any, res: Response, next: NextFunction) => {
 
     pool.clearTransaction(unSpentTxOuts);
 
-    res.redirect("/my-coin/blocks");
+    res.status(200).json({
+      message: 'OK',
+      payload: {
+        newBlock
+      }
+    })
   } catch (error) {
     console.log(error.message);
     res.status(400).json({
@@ -136,6 +141,27 @@ export const getHistory = (req: Request, res: Response, next: NextFunction) => {
       message: 'OK',
       payload: {
         blocks,
+        transactions
+      }
+    })
+  } catch (error) {
+    console.log(error.message);
+    
+    res.status(500).json({
+      message: error.message
+    })
+  }
+}
+
+export const getTransactionsByPrivateKey = (req: any, res: Response, NextFunction) => {
+  try {
+    const wallet: Wallet = req.myWallet;
+
+    const transactions = getMyTransactions(wallet.address, blockchain.chain, pool);
+
+    res.status(200).json({
+      message: 'OK',
+      payload: {
         transactions
       }
     })

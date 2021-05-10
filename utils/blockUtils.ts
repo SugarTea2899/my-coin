@@ -27,7 +27,7 @@ const adjustDifficultly = (previousBlock: Block, curTime: number): number => {
   if (previousBlock.timeStamp + Number.parseInt(process.env.MINE_RATE) > curTime)
     return difficultly + 1;
   
-  return difficultly - 1;
+  return difficultly > 1 ? difficultly - 1 : difficultly;
 };
 
 export const mineBlock = (blockchain: BlockChain, data: Transaction[]): Block => {

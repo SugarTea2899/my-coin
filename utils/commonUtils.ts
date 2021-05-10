@@ -1,4 +1,4 @@
-import { SUCCESS_TRANSACTION, WAITING_CONFIRM } from './constants';
+import { SUCCESS_TRANSACTION, WAITING_CONFIRM } from "./constants";
 import { v1 as uuidv1 } from "uuid";
 import { ec as EC } from "elliptic";
 import SHA256 from "crypto-js/sha256";
@@ -6,6 +6,7 @@ import UnspentTxOut from "../Transaction/UnspentTxOut";
 import Transaction from "../Transaction";
 import TxIn from "../Transaction/TxIn";
 import Block from "../BlockChain/Block";
+import Pool from "../Transaction/Pool";
 
 const ec = new EC("secp256k1");
 
@@ -29,14 +30,17 @@ export const verifySignature = (publicKey, signature, dataHash): boolean => {
   return ec.keyFromPublic(publicKey, "hex").verify(dataHash, signature);
 };
 
-export const verifyTransaction = (publicKey: string, transaction: Transaction): boolean => {
+export const verifyTransaction = (
+  publicKey: string,
+  transaction: Transaction
+): boolean => {
   transaction.txIns.forEach((txIn: TxIn) => {
     if (!verifySignature(publicKey, txIn.signature, transaction.hashData()))
       return false;
-  })
+  });
 
   return true;
-}
+};
 
 export const verifyUnspentTxOut = (
   id: string,
@@ -51,11 +55,10 @@ export const updateInPoolValueTransaction = (
   transaction: Transaction,
   unSpentTxOuts: Map<string, UnspentTxOut>
 ) => {
-
   transaction?.txIns?.forEach((txIn: TxIn) => {
     if (unSpentTxOuts.has(txIn.txOutId))
       unSpentTxOuts.get(txIn.txOutId).inPool = true;
-  })
+  });
 };
 
 export const convertTransactionFromChain = (chain: Block[]): any => {
@@ -68,22 +71,66 @@ export const convertTransactionFromChain = (chain: Block[]): any => {
       amount: tx.txOuts[0].amount,
       timeStamp: tx.timeStamp,
       id: tx.hashData(),
-      status: SUCCESS_TRANSACTION
+      block: block.index,
+      status: SUCCESS_TRANSACTION,
     }));
 
-    results = [...results, ... transactions];
-  })
+    results = [...results, ...transactions];
+  });
 
   return results.reverse();
-}
+};
 
 export const convertTransactionInPool = (txsInPool: Transaction[]): any => {
-  return txsInPool.map((tx: Transaction) => ({
-    senderAddress: tx.senderAddress,
-    receiverAddress: tx.txOuts[0].address,
-    amount: tx.txOuts[0].amount,
-    timeStamp: tx.timeStamp,
-    id: tx.hashData(),
-    status: WAITING_CONFIRM
-  })).reverse();
-}
+  return txsInPool
+    .map((tx: Transaction) => ({
+      senderAddress: tx.senderAddress,
+      receiverAddress: tx.txOuts[0].address,
+      amount: tx.txOuts[0].amount,
+      timeStamp: tx.timeStamp,
+      id: tx.hashData(),
+      block: "N/A",
+      status: WAITING_CONFIRM,
+    }))
+    .reverse();
+};
+
+export const getMyTransactions = (
+  publicKey: string,
+  chain: Block[],
+  pool: Pool
+) => {
+  let results: any = [];
+
+  chain.forEach((block: Block) => {
+    const transactions = block.data
+      .filter((tx: Transaction) => tx.senderAddress === publicKey)
+      .map((tx: Transaction) => ({
+        senderAddress: tx.senderAddress,
+        receiverAddress: tx.txOuts[0].address,
+        amount: tx.txOuts[0].amount,
+        timeStamp: tx.timeStamp,
+        id: tx.hashData(),
+        block: block.index,
+        status: SUCCESS_TRANSACTION,
+      }));
+
+    results = [...results, ...transactions];
+  });
+
+  const txInPool = pool.transactions
+    .filter((tx: Transaction) => tx.senderAddress === publicKey)
+    .map((tx: Transaction) => ({
+      senderAddress: tx.senderAddress,
+      receiverAddress: tx.txOuts[0].address,
+      amount: tx.txOuts[0].amount,
+      timeStamp: tx.timeStamp,
+      id: tx.hashData(),
+      block: "N/A",
+      status: WAITING_CONFIRM,
+    }));
+
+  results = [...results, ...txInPool]
+  
+  return results;
+};

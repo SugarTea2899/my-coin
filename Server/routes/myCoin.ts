@@ -24,4 +24,7 @@ router.get('/transactions', myCoinController.getTransactionsInPool)
 // get history
 router.get('/history', myCoinController.getHistory);
 
+// get my transactions
+router.get('/transactions/mine', myCoinAuthenticate, myCoinController.getTransactionsByPrivateKey)
+
 export default router;
