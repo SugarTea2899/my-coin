@@ -78,7 +78,7 @@ export const convertTransactionFromChain = (chain: Block[]): any => {
     results = [...results, ...transactions];
   });
 
-  return results.reverse();
+  return results;
 };
 
 export const convertTransactionInPool = (txsInPool: Transaction[]): any => {
@@ -91,8 +91,7 @@ export const convertTransactionInPool = (txsInPool: Transaction[]): any => {
       id: tx.hashData(),
       block: "N/A",
       status: WAITING_CONFIRM,
-    }))
-    .reverse();
+    }));
 };
 
 export const getMyTransactions = (
